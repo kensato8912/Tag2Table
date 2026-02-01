@@ -4,12 +4,68 @@
 from pathlib import Path
 from collections import Counter
 
-from database_manager import (
+from .database_manager import (
     load_tag_database, load_tag_map, save_tags_to_json, update_tag_database,
     get_category, scan_txt_files, extract_tags_from_file, tag_map,
     CATEGORIES, TAGS_DB_FILE, DB_FILE,
 )
-from ollama_client import (
+
+# 動態分類排序權重（愈小愈靠前）
+CATEGORY_SORT_WEIGHTS = {
+    "角色與作品 (Character)": 1,
+    "身體特徵 (Body)": 2,
+    "表情 (Expression)": 3,
+    "表情 (Pose)": 3,
+    "衣服配件 (Clothing)": 4,
+    "姿態動作 (Pose)": 5,
+    "光線風格 (Style)": 6,
+    "背景環境 (Background)": 7,
+}
+DEFAULT_SORT_WEIGHT = 8
+
+
+def _normalize_tag_for_lookup(tag: str) -> str:
+    """將標籤正規化以便與 JSON 比對（移除轉義符號）"""
+    return tag.replace("\\(", "(").replace("\\)", ")")
+
+
+def _build_category_lookup(db_path=None):
+    """從 all_characters_tags.json 建立 標籤->分類 對照，支援多種格式比對"""
+    db = load_tag_database(db_path)
+    lookup = {}
+    if not db:
+        return lookup
+    for en_tag, item in db.items():
+        cat = item.get("category")
+        if not cat:
+            continue
+        lookup[en_tag] = cat
+        normalized = _normalize_tag_for_lookup(en_tag)
+        if normalized != en_tag:
+            lookup[normalized] = cat
+        lookup[en_tag.replace("_", " ")] = cat
+        lookup[en_tag.replace(" ", "_")] = cat
+    return lookup
+
+
+def sort_tags_by_category(
+    tags: list[str],
+    db_path=None,
+) -> list[str]:
+    """
+    依 all_characters_tags.json 的 category 欄位對標籤排序。
+    權重：角色與作品(1) < 身體特徵(2) < 表情(3) < 衣服配件(4) < 姿態動作(5) < 光線風格(6) < 背景環境(7) < 其餘(8)
+    """
+    lookup = _build_category_lookup(db_path)
+
+    def sort_key(tag: str) -> tuple:
+        norm = _normalize_tag_for_lookup(tag)
+        cat = lookup.get(tag) or lookup.get(norm) or lookup.get(tag.replace("_", " ")) or lookup.get(tag.replace(" ", "_"))
+        weight = CATEGORY_SORT_WEIGHTS.get(cat, DEFAULT_SORT_WEIGHT) if cat else DEFAULT_SORT_WEIGHT
+        return (weight, tag)
+
+    return sorted(tags, key=sort_key)
+from .ollama_client import (
     init_gemini, get_ollama_client, get_ai_translation, get_gemini_translation,
     batch_translate_and_classify_gemini, batch_translate_and_classify_ollama,
 )
@@ -95,6 +151,8 @@ def process_with_ai(folder_path, ollama_url, model_name, output_file, enable_cla
 
     tags_need_translate = [t for t in sorted_tags
                           if t not in db or not VALID_TRANSLATION(db[t].get('zh_tag'))]
+    if enable_classification:
+        tags_need_translate = sort_tags_by_category(tags_need_translate)
     tags_reclassify_only = [t for t in sorted_tags
                            if t in db
                            and VALID_TRANSLATION(db[t].get('zh_tag'))
@@ -110,9 +168,13 @@ def process_with_ai(folder_path, ollama_url, model_name, output_file, enable_cla
         for i in range(0, len(tags_need_translate), batch_size):
             chunk = tags_need_translate[i:i + batch_size]
             if use_gemini:
-                batch_result = batch_translate_and_classify_gemini(chunk, gemini_api_key, actual_model, log_callback=log)
+                batch_result = batch_translate_and_classify_gemini(
+                    chunk, gemini_api_key, actual_model, log_callback=log, pre_sorted_hint=enable_classification
+                )
             else:
-                batch_result = batch_translate_and_classify_ollama(client, actual_model, chunk, log_callback=log)
+                batch_result = batch_translate_and_classify_ollama(
+                    client, actual_model, chunk, log_callback=log, pre_sorted_hint=enable_classification
+                )
             for en, data in batch_result.items():
                 tag_map_local[en] = data.get('zh_tag', '（未翻譯）')
                 if data.get('category'):

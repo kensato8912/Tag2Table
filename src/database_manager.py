@@ -9,10 +9,10 @@ from pathlib import Path
 from collections import Counter
 from datetime import datetime
 
-# 設定檔路徑（JSON 集中於 data 資料夾）
-_SCRIPT_DIR = Path(__file__).parent
-DATA_DIR = _SCRIPT_DIR / "data"
-TXT_OUTPUT_DIR = _SCRIPT_DIR / "txt"
+# 專案根目錄（src 的上一層）
+_PROJECT_ROOT = Path(__file__).parent.parent
+DATA_DIR = _PROJECT_ROOT / "data"
+TXT_OUTPUT_DIR = _PROJECT_ROOT / "txt"
 
 def _ensure_data_dir():
     """確保 data 資料夾存在"""
@@ -41,12 +41,12 @@ PROMPT_PRESETS_FILE = DATA_DIR / "prompt_presets.json"
 
 # 啟動時執行一次遷移（舊路徑 → data/）
 for _old, _new in [
-    (_SCRIPT_DIR / "config.json", CONFIG_FILE),
-    (_SCRIPT_DIR / "tags_db.json", TAGS_DB_FILE),
-    (_SCRIPT_DIR / "all_characters_tags.json", DB_FILE),
-    (_SCRIPT_DIR / "categories.json", CATEGORIES_FILE),
-    (_SCRIPT_DIR / "tag_map.json", TAG_MAP_FILE),
-    (_SCRIPT_DIR / "prompt_presets.json", PROMPT_PRESETS_FILE),
+    (_PROJECT_ROOT / "config.json", CONFIG_FILE),
+    (_PROJECT_ROOT / "tags_db.json", TAGS_DB_FILE),
+    (_PROJECT_ROOT / "all_characters_tags.json", DB_FILE),
+    (_PROJECT_ROOT / "categories.json", CATEGORIES_FILE),
+    (_PROJECT_ROOT / "tag_map.json", TAG_MAP_FILE),
+    (_PROJECT_ROOT / "prompt_presets.json", PROMPT_PRESETS_FILE),
 ]:
     _migrate_if_needed(_old, _new)
 

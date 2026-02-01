@@ -7,12 +7,13 @@
 ## 📂 專案結構
 
 ```
-├── main.py                # 主程式（啟動視窗、整合各模組）
-├── database_manager.py    # 資料庫模組（JSON 讀取、寫入、合併）
-├── ollama_client.py       # 網路模組（連線 Ollama / Mac / Gemini 翻譯標籤）
-├── processor.py           # 處理模組（掃描、翻譯、分類、產出流程）
-├── ui_components.py       # 介面模組（按鈕、分頁、群組、視窗）
-├── Tag-to-Table.py        # 相容入口（等同 main.py）
+├── src/                      # 程式碼
+│   ├── main.py               # 主程式（啟動視窗、整合各模組）
+│   ├── database_manager.py   # 資料庫模組（JSON 讀取、寫入、合併）
+│   ├── ollama_client.py      # 網路模組（連線 Ollama / Mac / Gemini 翻譯標籤）
+│   ├── processor.py          # 處理模組（掃描、翻譯、分類、產出流程）
+│   └── ui_components.py      # 介面模組（按鈕、分頁、群組、視窗）
+├── Tag-to-Table.py           # 相容入口（等同 python -m src.main）
 ├── data/                     # JSON 集中於此
 │   ├── config.json
 │   ├── tags_db.json
@@ -28,7 +29,7 @@
 
 | 檔案 | 說明 |
 |------|------|
-| `main.py` | 主程式入口 |
+| `src/main.py` | 主程式入口 |
 | `執行標籤翻譯.bat` | 一鍵啟動（會自動檢查並安裝套件） |
 | `安裝依賴.bat` | 一鍵安裝所有依賴套件 |
 | `設定Git身分.bat` | 設定 Git user.name、user.email（首次必做） |

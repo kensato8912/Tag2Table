@@ -71,8 +71,8 @@ def _run_file_report_stream(folder_path):
         yield text
 
 
-def render(log_output: gr.Textbox, defaults: dict):
-    """建立標籤翻譯管理分頁，回傳供 save_config 使用的元件 dict"""
+def render(defaults: dict):
+    """建立標籤翻譯管理分頁。回傳 (comps_dict, bindings) 供 web_ui 綁定 log_output。"""
     with gr.Row():
         with gr.Column(scale=1):
             with gr.Row():
@@ -109,24 +109,15 @@ def render(log_output: gr.Textbox, defaults: dict):
                 report_file_btn = gr.Button("逐檔報告")
                 save_config_btn = gr.Button("儲存設定")
 
-    process_btn.click(
-        fn=_run_translate_stream,
-        inputs=[folder_path, output_file, enable_classification, translation_mode,
-                gemini_api_key, ollama_host_mode, ollama_remote_ip, model_name],
-        outputs=log_output,
-    )
-    report_folder_btn.click(
-        fn=_run_folder_report_stream,
-        inputs=[folder_path],
-        outputs=log_output,
-    )
-    report_file_btn.click(
-        fn=_run_file_report_stream,
-        inputs=[folder_path],
-        outputs=log_output,
-    )
+    bindings = [
+        (process_btn, _run_translate_stream,
+         [folder_path, output_file, enable_classification, translation_mode,
+          gemini_api_key, ollama_host_mode, ollama_remote_ip, model_name]),
+        (report_folder_btn, _run_folder_report_stream, [folder_path]),
+        (report_file_btn, _run_file_report_stream, [folder_path]),
+    ]
 
-    return {
+    comps = {
         "folder_path": folder_path,
         "output_file": output_file,
         "enable_classification": enable_classification,
@@ -137,3 +128,4 @@ def render(log_output: gr.Textbox, defaults: dict):
         "model_name": model_name,
         "save_config_btn": save_config_btn,
     }
+    return comps, bindings

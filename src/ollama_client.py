@@ -8,8 +8,7 @@ import urllib.request
 import urllib.error
 from openai import OpenAI
 
-# 從資料庫模組取得分類（翻譯＋分類 prompt 用）
-from database_manager import CATEGORIES, get_category
+from .database_manager import CATEGORIES, get_category
 
 # 統一翻譯 Prompt（Ollama / Gemini 共用）
 TRANSLATE_PROMPT_BASE = (
@@ -29,11 +28,17 @@ def build_translate_prompt(tag=None, tags_text=None):
 CLASSIFY_CATEGORIES = list(CATEGORIES.keys()) + ["其他 (General)"]
 
 
-def build_translate_and_classify_prompt(tags_text):
+def build_translate_and_classify_prompt(tags_text, pre_sorted_hint=False):
     """建立「翻譯＋分類」合併 prompt，一次 API 回傳兩者"""
     cat_list = "、".join(CLASSIFY_CATEGORIES)
+    order_hint = (
+        "\n【重要】下列標籤已按「人物→衣裝→背景」排好序，請保持此順序進行通順的繁體中文翻譯。\n"
+        if pre_sorted_hint
+        else ""
+    )
     return (
         f"{TRANSLATE_PROMPT_BASE}請翻譯以下 SD 繪圖標籤並分類。\n"
+        f"{order_hint}"
         f"分類限定為：[{cat_list}]\n"
         "請嚴格依照格式回傳，一行一筆： 英文標籤 | 分類 | 中文翻譯\n"
         "例如：bangs | 身體特徵 (Body) | 劉海\n"
@@ -296,7 +301,7 @@ def batch_translate_gemini(tags_list, api_key, model_name='gemini-1.5-flash', lo
 
 # --- 批次翻譯＋分類 ---
 
-def batch_translate_and_classify_gemini(tags_list, api_key, model_name, log_callback=None):
+def batch_translate_and_classify_gemini(tags_list, api_key, model_name, log_callback=None, pre_sorted_hint=False):
     """一次讓 AI 翻譯並分類，回傳 {tag: {zh_tag, category}}"""
     def log(msg):
         if log_callback:
@@ -309,7 +314,7 @@ def batch_translate_and_classify_gemini(tags_list, api_key, model_name, log_call
         from google import genai
         client = genai.Client(api_key=api_key)
         tags_text = "\n".join(t.strip().replace("\\(", "(").replace("\\)", ")") for t in tags_list)
-        prompt = build_translate_and_classify_prompt(tags_text)
+        prompt = build_translate_and_classify_prompt(tags_text, pre_sorted_hint=pre_sorted_hint)
         log(f"🧠 批次翻譯＋分類 {len(tags_list)} 個標籤（智慧更新其他類）...")
         time.sleep(2)
         response = client.models.generate_content(model=model_name, contents=prompt)
@@ -323,7 +328,7 @@ def batch_translate_and_classify_gemini(tags_list, api_key, model_name, log_call
         return {t: {"zh_tag": "（未翻譯）", "category": "其他 (General)"} for t in tags_list}
 
 
-def batch_translate_and_classify_ollama(client, model_name, tags_list, log_callback=None):
+def batch_translate_and_classify_ollama(client, model_name, tags_list, log_callback=None, pre_sorted_hint=False):
     """Ollama 版：一次翻譯並分類"""
     def log(msg):
         if log_callback:
@@ -334,7 +339,7 @@ def batch_translate_and_classify_ollama(client, model_name, tags_list, log_callb
         return {}
     try:
         tags_text = "\n".join(t.strip().replace("\\(", "(").replace("\\)", ")") for t in tags_list)
-        prompt = build_translate_and_classify_prompt(tags_text)
+        prompt = build_translate_and_classify_prompt(tags_text, pre_sorted_hint=pre_sorted_hint)
         log(f"🧠 批次翻譯＋分類 {len(tags_list)} 個標籤（智慧更新其他類）...")
         time.sleep(2)
         response = client.chat.completions.create(

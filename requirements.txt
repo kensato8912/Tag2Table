@@ -2,3 +2,8 @@ openai>=1.0.0
 google-genai>=1.0.0
 Pillow>=9.0.0
 pyperclip>=1.8.0
+onnxruntime>=1.16.0
+gradio>=4.0.0
+mediapipe==0.10.9
+opencv-python>=4.8.0
+gallery-dl>=1.26.0

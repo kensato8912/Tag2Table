@@ -81,7 +81,8 @@ def browse_file_open(current: str, title: str = "選擇檔案", filetypes=None) 
         root = __import__("tkinter").Tk()
         root.withdraw()
         root.attributes("-topmost", True)
-        init_dir = str(Path(current).parent) if current else None
+        p = Path(current or ".")
+        init_dir = str(p) if p.is_dir() else str(p.parent) if p.exists() else str(p.parent)
         path = filedialog.askopenfilename(title=title, initialdir=init_dir, filetypes=filetypes)
         root.destroy()
         return path if path else (current or "")
@@ -89,13 +90,27 @@ def browse_file_open(current: str, title: str = "選擇檔案", filetypes=None) 
         return current or ""
 
 
+def browse_zip(current: str) -> str:
+    """開啟檔案對話框選擇 .zip 壓縮檔（可從資料夾內挑選）"""
+    if not _HAS_FILEDIALOG:
+        return current or ""
+    return browse_file_open(
+        current or ".",
+        title="選擇 ZIP 壓縮檔",
+        filetypes=[("ZIP 壓縮檔", "*.zip"), ("所有檔案", "*.*")],
+    )
+
+
 def stream_from_log_callback(log_producer):
-    """通用日誌串流 generator"""
+    """
+    通用日誌串流 generator。
+    分頁按鈕點擊後，透過 log_producer 調用 src/ 邏輯，輸出 yield 到系統日誌區。
+    """
     log_clear()
     _log_buffer.clear()
 
     def run():
-        def log_cb(m, replace_last=False):
+        def log_cb(m, replace_last=False, **kwargs):
             _log_queue.put(("append", m, replace_last))
         try:
             log_producer(log_cb)
@@ -127,7 +142,9 @@ def stream_from_log_callback(log_producer):
 
 def load_defaults():
     from src.database_manager import load_config, TXT_OUTPUT_DIR
+    _PROJECT_ROOT = Path(__file__).parent.parent
     cfg = load_config()
+    default_crawl = str(_PROJECT_ROOT / "data" / "temp_raw")
     return {
         "folder_path": cfg.get("folder_path", ""),
         "output_file": cfg.get("output_file", str(TXT_OUTPUT_DIR / "AI_Tag_Reference.txt")),
@@ -145,4 +162,10 @@ def load_defaults():
         "helper_trigger_words": cfg.get("helper_trigger_words", "Niyaniya, Ibuki"),
         "wd14_source_dir": cfg.get("wd14_source_dir", ""),
         "wd14_trigger_word": cfg.get("wd14_trigger_word", "Niyaniya"),
+        "crawler_tags": cfg.get("crawler_tags", "hand_focus rating:g score:>20"),
+        "crawler_output_dir": cfg.get("crawler_output_dir", default_crawl),
+        "crawler_sleep": cfg.get("crawler_sleep", 1.0),
+        "crawler_chain_wd14": cfg.get("crawler_chain_wd14", False),
+        "cropper_source": cfg.get("cropper_source", ""),
+        "cropper_dest": cfg.get("cropper_dest", str(_PROJECT_ROOT / "data" / "crop_output")),
     }

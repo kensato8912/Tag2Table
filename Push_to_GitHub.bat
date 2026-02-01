@@ -1,11 +1,11 @@
 @echo off
 chcp 65001 >nul
-title 手動推送至 GitHub
+title Manual Push to GitHub
 
 cd /d "%~dp0"
 
 echo ========================================
-echo   手動執行 Git 指令（首次推送）
+echo   Manual Git Commands (First Push)
 echo ========================================
 echo.
 
@@ -23,13 +23,13 @@ echo.
 REM Check Git identity (required for commit)
 git config --global user.name >nul 2>&1
 if errorlevel 1 (
-    echo [ERROR] Git user.name not set. Please run 設定Git身分.bat first.
+    echo [ERROR] Git user.name not set. Please run Set_Git_Identity.bat first.
     pause
     exit /b 1
 )
 git config --global user.email >nul 2>&1
 if errorlevel 1 (
-    echo [ERROR] Git user.email not set. Please run 設定Git身分.bat first.
+    echo [ERROR] Git user.email not set. Please run Set_Git_Identity.bat first.
     pause
     exit /b 1
 )

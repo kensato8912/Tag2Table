@@ -1,43 +1,43 @@
 @echo off
 chcp 65001 >nul
-title Tag2Table - AI 標籤統計與翻譯工具
+title Tag2Table - AI Tag Translator
 
 echo ========================================
-echo   Tag2Table - AI 標籤統計與翻譯工具
+echo   Tag2Table - AI Tag Translator
 echo ========================================
 echo.
 
-REM 切換到腳本所在目錄
+REM Change to script directory
 cd /d "%~dp0"
 
-REM 檢查 Python 是否可用
+REM Check Python
 python --version >nul 2>&1
 if errorlevel 1 (
-    echo [錯誤] 找不到 Python，請確認已安裝並加入 PATH
+    echo [ERROR] Python not found. Please install Python and add to PATH
     pause
     exit /b 1
 )
 
-REM 檢查是否有安裝所需套件
+REM Check and install dependencies
 python -c "import openai" >nul 2>&1
 if errorlevel 1 (
-    echo [提示] 正在安裝 openai...
+    echo [INFO] Installing openai...
     python -m pip install openai
 )
 python -c "from google import genai" >nul 2>&1
 if errorlevel 1 (
-    echo [提示] 正在安裝 google-genai...
+    echo [INFO] Installing google-genai...
     python -m pip install google-genai
 )
 if errorlevel 1 (
-    echo [建議] 若安裝失敗，請執行「安裝依賴.bat」
+    echo [TIP] If install failed, run the dependency installer batch file
 )
 echo.
 
-echo 啟動程式...
+echo Starting...
 echo.
 
-python main.py
+python -m src.main
 
 echo.
 echo ========================================

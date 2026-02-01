@@ -1,8 +1,8 @@
 """
-相容入口：導向新模組架構主程式
-執行 python Tag-to-Table.py 等同於 python main.py
+相容入口：導向 src 模組主程式
+執行 python Tag-to-Table.py 等同於 python -m src.main
 """
-from main import main
+from src.main import main
 
 if __name__ == "__main__":
     main()

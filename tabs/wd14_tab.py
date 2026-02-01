@@ -20,12 +20,8 @@ def _run_wd14_stream(wd14_source_dir, train_data_dir, trigger, sort_by):
         yield text
 
 
-def render(log_output: gr.Textbox, defaults: dict, train_data_dir: gr.Textbox):
-    """
-    建立 WD14 標籤分頁。
-    train_data_dir 來自 LoRA 分頁，作為輸入資料夾的備用。
-    回傳供 save_config 使用的元件 dict。
-    """
+def render(defaults: dict, train_data_dir: gr.Textbox):
+    """建立 WD14 標籤分頁。train_data_dir 來自 LoRA 分頁作為備用。回傳 (comps_dict, bindings)。"""
     with gr.Row():
         with gr.Column(scale=1):
             with gr.Row():
@@ -40,14 +36,14 @@ def render(log_output: gr.Textbox, defaults: dict, train_data_dir: gr.Textbox):
                                                 value=defaults["sort_tags_by_category"])
             wd14_btn = gr.Button("執行 WD14 標籤", variant="primary")
 
-    wd14_btn.click(
-        fn=_run_wd14_stream,
-        inputs=[wd14_source_dir, train_data_dir, wd14_trigger_word, sort_tags_by_category],
-        outputs=log_output,
-    )
+    bindings = [
+        (wd14_btn, _run_wd14_stream,
+         [wd14_source_dir, train_data_dir, wd14_trigger_word, sort_tags_by_category]),
+    ]
 
-    return {
+    comps = {
         "wd14_source_dir": wd14_source_dir,
         "wd14_trigger_word": wd14_trigger_word,
         "sort_tags_by_category": sort_tags_by_category,
     }
+    return comps, bindings

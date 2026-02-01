@@ -24,3 +24,13 @@ data/all_characters_tags.json
 
 # 輸出檔（個人產生，通常不提交）
 txt/
+
+# 收割圖片、訓練產物（避免巨型垃圾上傳）
+out/
+output/
+img/
+data/crop_output/
+
+# 訓練模型（檔案過大，Git 跑不動）
+*.safetensors
+*.onnx

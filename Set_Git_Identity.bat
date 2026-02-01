@@ -32,6 +32,6 @@ git config --global user.name
 git config --global user.email
 echo.
 echo ========================================
-echo Done. You can now run 手動推送至GitHub.bat
+echo Done. You can now run Push_to_GitHub.bat
 echo ========================================
 pause
