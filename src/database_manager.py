@@ -31,6 +31,17 @@ def _migrate_if_needed(old_path, new_path):
         except Exception:
             pass
 
+
+def _init_from_example_if_needed(real_path, example_name):
+    """若實檔不存在但 .example.json 存在，則從範例複製建立"""
+    example_path = DATA_DIR / example_name
+    if not real_path.exists() and example_path.exists():
+        try:
+            _ensure_data_dir()
+            shutil.copy2(example_path, real_path)
+        except Exception:
+            pass
+
 # JSON 路徑（優先使用 data/，啟動時會檢查舊位置並遷移）
 CONFIG_FILE = DATA_DIR / "config.json"
 TAGS_DB_FILE = DATA_DIR / "tags_db.json"
@@ -49,6 +60,17 @@ for _old, _new in [
     (_PROJECT_ROOT / "prompt_presets.json", PROMPT_PRESETS_FILE),
 ]:
     _migrate_if_needed(_old, _new)
+
+# 若實檔不存在，從 .example.json 複製建立（首次 clone 後自動初始化）
+for _real, _example in [
+    (CONFIG_FILE, "config.example.json"),
+    (TAG_MAP_FILE, "tag_map.example.json"),
+    (CATEGORIES_FILE, "categories.example.json"),
+    (PROMPT_PRESETS_FILE, "prompt_presets.example.json"),
+    (TAGS_DB_FILE, "tags_db.example.json"),
+    (DB_FILE, "all_characters_tags.example.json"),
+]:
+    _init_from_example_if_needed(_real, _example)
 
 # 預設分類（若 JSON 不存在時使用）
 DEFAULT_CATEGORIES = {

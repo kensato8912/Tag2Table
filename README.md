@@ -15,12 +15,12 @@
 │   └── ui_components.py      # 介面模組（按鈕、分頁、群組、視窗）
 ├── Tag-to-Table.py           # 相容入口（等同 python -m src.main）
 ├── data/                     # JSON 集中於此
-│   ├── config.json
-│   ├── tags_db.json
-│   ├── all_characters_tags.json
-│   ├── categories.json
+│   ├── *.example.json        # 範例檔（可提交），clone 後首次執行會自動複製建立實檔
+│   ├── config.json           # 實檔（gitignore，含私人設定）
 │   ├── tag_map.json
-│   └── prompt_presets.json
+│   ├── categories.json
+│   ├── crop_parts.json
+│   └── ...
 └── txt/                      # 輸出文字檔預設存放
     ├── AI_Tag_Reference.txt
     ├── Current_Folder_Tag_Report.txt
@@ -36,12 +36,14 @@
 | `手動推送至GitHub.bat` | 一鍵執行完整 Git 指令（首次推送） |
 | `上傳至Git.bat` | 互動式加入、提交、推送（後續更新） |
 | `requirements.txt` | Python 套件清單 |
-| `data/config.json` | 本地設定（API Key、路徑等，自動產生，請勿提交） |
-| `data/tags_db.json` | 標籤快照（單次輸出） |
-| `data/all_characters_tags.json` | 累積資料庫（次數累加、翻譯更新、記錄角色、AI 分類） |
-| `data/categories.json` | 分類關鍵字定義（可編輯，程式啟動時載入） |
-| `data/tag_map.json` | 基礎翻譯對照（英文→中文，可編輯，程式啟動時載入） |
-| `data/prompt_presets.json` | 角色快速套裝（題詞組合器一鍵載入，可在 Memo 轉換存成） |
+| `data/config.json` | 本地設定（API Key、路徑等，**gitignore**，自動產生） |
+| `data/tags_db.json` | 標籤快照（**gitignore**） |
+| `data/all_characters_tags.json` | 累積資料庫（**gitignore**） |
+| `data/categories.json` | 分類關鍵字定義（**gitignore**） |
+| `data/tag_map.json` | 基礎翻譯對照（**gitignore**） |
+| `data/prompt_presets.json` | 角色快速套裝（**gitignore**） |
+| `data/crop_parts.json` | 裁切部位設定（**gitignore**） |
+| `data/*.example.json` | **範例檔**（可提交），首次執行時會自動複製建立對應 JSON |
 
 ## 📋 功能特色
 

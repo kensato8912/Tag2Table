@@ -23,6 +23,12 @@ _DEFAULT_PARTS = {
 def load_crop_parts() -> dict:
     """載入 data/crop_parts.json，不存在或失敗則回傳預設"""
     try:
+        # 若實檔不存在，從範例複製建立
+        example_path = _PROJECT_ROOT / "data" / "crop_parts.example.json"
+        if not CROP_PARTS_FILE.exists() and example_path.exists():
+            import shutil
+            CROP_PARTS_FILE.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(example_path, CROP_PARTS_FILE)
         if CROP_PARTS_FILE.exists():
             data = json.loads(CROP_PARTS_FILE.read_text(encoding="utf-8"))
             if isinstance(data, dict) and "parts" in data and data["parts"]:

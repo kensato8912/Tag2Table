@@ -1,0 +1,19 @@
+{
+  "gemini_api_key": "",
+  "folder_path": "",
+  "output_file": "AI_Tag_Reference.txt",
+  "ollama_url": "http://localhost:11434/v1",
+  "ollama_host_mode": "local",
+  "ollama_remote_ip": "",
+  "base_model_path": "",
+  "train_data_dir": "",
+  "lora_output_name": "My_LoRA",
+  "sort_tags_by_category": true,
+  "helper_ref_dest": "",
+  "helper_trigger_words": "character1, character2",
+  "wd14_source_dir": "",
+  "wd14_trigger_word": "",
+  "crawler_tags": "",
+  "crawler_output_dir": "",
+  "crawler_sleep": 1.0
+}

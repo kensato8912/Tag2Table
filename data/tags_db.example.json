@@ -1,0 +1,20 @@
+[
+  {
+    "en_tag": "1girl",
+    "zh_tag": "1名女孩",
+    "count": 10,
+    "category": "角色與作品 (Character)"
+  },
+  {
+    "en_tag": "solo",
+    "zh_tag": "單人",
+    "count": 8,
+    "category": "光線風格 (Style)"
+  },
+  {
+    "en_tag": "long hair",
+    "zh_tag": "長髮",
+    "count": 5,
+    "category": "身體特徵 (Body)"
+  }
+]

@@ -1,0 +1,20 @@
+{
+  "身體特徵 (Body)": [
+    "hair", "eyes", "blush", "body", "face", "skin", "hand", "foot"
+  ],
+  "衣服配件 (Clothing)": [
+    "shirt", "skirt", "jacket", "hat", "dress", "shoes"
+  ],
+  "姿態動作 (Pose)": [
+    "standing", "sitting", "looking", "smile", "holding"
+  ],
+  "背景環境 (Background)": [
+    "background", "indoors", "outdoors", "simple", "white"
+  ],
+  "光線風格 (Style)": [
+    "light", "dark", "anime", "solo", "masterpiece"
+  ],
+  "角色與作品 (Character)": [
+    "1girl", "2girls", "character_name"
+  ]
+}
